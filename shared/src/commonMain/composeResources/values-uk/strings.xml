@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Список справ</string>
+
+    <string name="onb_title_1">Вітаємо!</string>
+    <string name="onb_desc_1">Плануйте свій день за допомогою простого й зручного списку справ.</string>
+    <string name="onb_title_2">Плануйте завдання</string>
+    <string name="onb_desc_2">Додавайте завдання, позначайте виконані та зосереджуйтесь на головному.</string>
+    <string name="onb_title_3">Будьте продуктивними</string>
+    <string name="onb_desc_3">Відстежуйте прогрес щодня й досягайте своїх цілей.</string>
+    <string name="skip">Пропустити</string>
+    <string name="next">Далі</string>
+    <string name="start">Розпочати</string>
+
+    <string name="todos_title">Мої завдання</string>
+    <string name="add_hint">Нове завдання</string>
+    <string name="add">Додати</string>
+    <string name="empty">Завдань поки немає</string>
+    <string name="error_loading">Не вдалося завантажити завдання. Перевірте з'єднання.</string>
+    <string name="retry">Повторити</string>
+    <string name="completed_of">Виконано %1$d з %2$d</string>
+    <string name="filter_all">Усі</string>
+    <string name="filter_active">Активні</string>
+    <string name="filter_done">Виконані</string>
+    <string name="test_onboarding">Тест</string>
+</resources>
