@@ -1,27 +1,26 @@
 package com.example.myapplication.ui.onboarding
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.myapplication.generated.resources.*
 import com.example.myapplication.ui.components.PageIndicator
-import com.example.myapplication.ui.theme.BrandGradient
-import com.example.myapplication.ui.theme.BrandTealLight
-import com.example.myapplication.ui.theme.SoftGradient
-import kotlinx.coroutines.launch
+import com.example.myapplication.ui.components.PaperSheet
+import com.example.myapplication.ui.theme.LocalPaper
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 private data class OnboardingPage(
     val emoji: String,
@@ -29,6 +28,7 @@ private data class OnboardingPage(
     val description: StringResource
 )
 
+// Кількість слайдів має збігатися з OnboardingState.pageCount
 private val pages = listOf(
     OnboardingPage("👋", Res.string.onb_title_1, Res.string.onb_desc_1),
     OnboardingPage("📝", Res.string.onb_title_2, Res.string.onb_desc_2),
@@ -36,88 +36,98 @@ private val pages = listOf(
 )
 
 @Composable
-fun OnboardingScreen(onFinish: () -> Unit) {
-    val pagerState = rememberPagerState(pageCount = { pages.size })
-    val scope = rememberCoroutineScope()
-    val isLast = pagerState.currentPage == pages.lastIndex
+fun OnboardingScreen(
+    onFinished: () -> Unit,
+    viewModel: OnboardingViewModel = koinViewModel()
+) {
+    val paper = LocalPaper.current
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val pagerState = rememberPagerState(pageCount = { state.pageCount })
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .safeDrawingPadding()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            TextButton(onClick = onFinish) { Text(stringResource(Res.string.skip)) }
-        }
-
-        HorizontalPager(state = pagerState, modifier = Modifier.weight(1f)) { index ->
-            val page = pages[index]
-            Column(
-                Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Box(Modifier.size(260.dp), contentAlignment = Alignment.Center) {
-                    Box(
-                        Modifier
-                            .size(220.dp)
-                            .background(BrandGradient, CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(page.emoji, fontSize = 96.sp)
-                    }
-                    Box(
-                        Modifier
-                            .size(44.dp)
-                            .align(Alignment.TopEnd)
-                            .background(SoftGradient, CircleShape)
-                    )
-                    Box(
-                        Modifier
-                            .size(28.dp)
-                            .align(Alignment.BottomStart)
-                            .background(BrandTealLight, CircleShape)
-                    )
-                }
-                Spacer(Modifier.height(36.dp))
-                Text(
-                    stringResource(page.title),
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(Modifier.height(12.dp))
-                Text(
-                    stringResource(page.description),
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.75f),
-                    modifier = Modifier.padding(horizontal = 12.dp)
-                )
+    LaunchedEffect(Unit) {
+        viewModel.effects.collect { effect ->
+            when (effect) {
+                OnboardingEffect.NavigateToAuth -> onFinished()
             }
         }
+    }
+    // State -> Pager (кнопка «Далі»)
+    LaunchedEffect(state.page) {
+        if (pagerState.currentPage != state.page) pagerState.animateScrollToPage(state.page)
+    }
+    // Pager -> State (свайп)
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }.collect {
+            viewModel.onIntent(OnboardingIntent.PageChanged(it))
+        }
+    }
 
-        PageIndicator(
-            pageCount = pages.size,
-            currentPage = pagerState.currentPage,
-            modifier = Modifier.padding(vertical = 20.dp)
-        )
+    Box(
+        Modifier.fillMaxSize().background(paper.desk).safeDrawingPadding().padding(12.dp)
+    ) {
+        PaperSheet(Modifier.fillMaxSize()) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                TextButton(onClick = { viewModel.onIntent(OnboardingIntent.Skip) }) {
+                    Text(stringResource(Res.string.skip), color = paper.ink)
+                }
+            }
 
-        Button(
-            onClick = {
-                if (isLast) onFinish()
-                else scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
-            },
-            modifier = Modifier.fillMaxWidth().height(56.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = Color.White
+            HorizontalPager(state = pagerState, modifier = Modifier.weight(1f)) { index ->
+                val page = pages[index]
+                Column(
+                    Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Box(Modifier.size(200.dp), contentAlignment = Alignment.Center) {
+                        Box(
+                            Modifier
+                                .size(160.dp)
+                                .background(paper.rule.copy(alpha = 0.45f), CircleShape)
+                                .border(2.dp, paper.ink, CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) { Text(page.emoji, fontSize = 72.sp) }
+                        Box(
+                            Modifier
+                                .size(32.dp)
+                                .align(Alignment.TopEnd)
+                                .background(paper.margin, CircleShape)
+                        )
+                    }
+                    Spacer(Modifier.height(28.dp))
+                    Text(
+                        stringResource(page.title),
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = paper.ink,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    Text(
+                        stringResource(page.description),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = paper.ink.copy(alpha = 0.8f),
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
+            PageIndicator(
+                pageCount = state.pageCount,
+                currentPage = state.page,
+                modifier = Modifier.align(Alignment.CenterHorizontally).padding(vertical = 16.dp)
             )
-        ) {
-            Text(stringResource(if (isLast) Res.string.start else Res.string.next))
+
+            Button(
+                onClick = { viewModel.onIntent(OnboardingIntent.Next) },
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = paper.ink,
+                    contentColor = paper.paper
+                )
+            ) {
+                Text(stringResource(if (state.isLast) Res.string.start else Res.string.next))
+            }
+            Spacer(Modifier.height(16.dp))
         }
     }
 }

@@ -1,40 +1,35 @@
 package com.example.myapplication
 
 import androidx.compose.runtime.*
-import co.touchlab.kermit.Logger
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.myapplication.data.AppSettings
-import com.example.myapplication.ui.onboarding.OnboardingScreen
+import com.example.myapplication.di.appModule
+import com.example.myapplication.navigation.AppNavigation
+import com.example.myapplication.navigation.AuthRoute
+import com.example.myapplication.navigation.OnboardingRoute
+import com.example.myapplication.ui.main.MainViewModel
 import com.example.myapplication.ui.theme.AppTheme
-import com.example.myapplication.ui.todos.TodoScreen
+import org.koin.compose.KoinApplication
+import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun App() {
-    val settings = remember { AppSettings() }
-    var onboardingDone by remember { mutableStateOf(settings.onboardingCompleted) }
-    var darkTheme by remember { mutableStateOf(settings.darkTheme) }
+    KoinApplication(application = { modules(appModule) }) {
+        val appSettings = koinInject<AppSettings>()
+        val mainViewModel = koinViewModel<MainViewModel>()
+        val mainState by mainViewModel.state.collectAsStateWithLifecycle()
+        var darkTheme by remember { mutableStateOf(appSettings.darkTheme) }
 
-    LaunchedEffect(Unit) {
-        Logger.i("App") { "App started, onboardingDone=$onboardingDone, dark=$darkTheme" }
-    }
-
-    AppTheme(darkTheme = darkTheme) {
-        if (!onboardingDone) {
-            OnboardingScreen(onFinish = {
-                settings.onboardingCompleted = true
-                onboardingDone = true
-            })
-        } else {
-            TodoScreen(
+        AppTheme(darkTheme = darkTheme) {
+            AppNavigation(
+                startRoute = if (mainState.onboardingCompleted) AuthRoute else OnboardingRoute,
                 darkTheme = darkTheme,
                 onDarkThemeChange = {
                     darkTheme = it
-                    settings.darkTheme = it
+                    appSettings.darkTheme = it
                 },
-                onShowOnboarding = {
-                    Logger.i("App") { "Onboarding reopened from Test button" }
-                    settings.onboardingCompleted = false
-                    onboardingDone = false
-                }
+                onTestOnboarding = mainViewModel::onTestOnboarding
             )
         }
     }

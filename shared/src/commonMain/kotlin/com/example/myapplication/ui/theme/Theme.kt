@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.CompositionLocalProvider
 import com.example.myapplication.generated.resources.Res
 import com.example.myapplication.generated.resources.montserrat_bold
 import com.example.myapplication.generated.resources.montserrat_regular
@@ -57,19 +58,22 @@ private fun appTypography(): Typography {
     )
 }
 
+
 @Composable
 fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    MaterialTheme(
-        colorScheme = if (darkTheme) DarkColors else LightColors,
-        typography = appTypography(),
-        shapes = Shapes(
-            small = RoundedCornerShape(12.dp),
-            medium = RoundedCornerShape(20.dp),
-            large = RoundedCornerShape(28.dp)
-        ),
-        content = content
-    )
+    CompositionLocalProvider(LocalPaper provides if (darkTheme) DarkPaper else LightPaper) {
+        MaterialTheme(
+            colorScheme = if (darkTheme) DarkColors else LightColors,
+            typography = appTypography(),
+            shapes = Shapes(
+                small = RoundedCornerShape(12.dp),
+                medium = RoundedCornerShape(20.dp),
+                large = RoundedCornerShape(28.dp)
+            ),
+            content = content
+        )
+    }
 }

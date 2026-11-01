@@ -22,4 +22,17 @@
     <string name="filter_active">Активні</string>
     <string name="filter_done">Виконані</string>
     <string name="test_onboarding">Тест</string>
+    <string name="throw_away">Викинути</string>
+    <string name="auth_title">Вхід</string>
+    <string name="auth_subtitle">Введіть дані, щоб продовжити</string>
+    <string name="username">Ім’я користувача</string>
+    <string name="password">Пароль</string>
+    <string name="sign_in">Увійти</string>
+    <string name="show">Показати</string>
+    <string name="hide">Сховати</string>
+    <string name="error_required">Це поле обов’язкове</string>
+    <string name="error_username_short">Щонайменше 3 символи</string>
+    <string name="error_username_chars">Лише літери, цифри, підкреслення та крапка</string>
+    <string name="error_password_short">Щонайменше 6 символів</string>
+    <string name="error_password_weak">Використайте літери та цифри</string>
 </resources>
