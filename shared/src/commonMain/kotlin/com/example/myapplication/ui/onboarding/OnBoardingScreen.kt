@@ -1,21 +1,18 @@
 package com.example.myapplication.ui.onboarding
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.myapplication.generated.resources.*
-import com.example.myapplication.ui.components.PageIndicator
+import com.example.myapplication.ui.components.ChecklistIndicator
 import com.example.myapplication.ui.components.PaperSheet
 import com.example.myapplication.ui.theme.LocalPaper
 import org.jetbrains.compose.resources.StringResource
@@ -23,16 +20,16 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 private data class OnboardingPage(
-    val emoji: String,
     val title: StringResource,
     val description: StringResource
 )
 
-// Кількість слайдів має збігатися з OnboardingState.pageCount
+// Кількість слайдів має збігатися з OnboardingState.pageCount.
+// Індекс слайда задає тип анімації в MiniTodoSheet (0, 1, 2).
 private val pages = listOf(
-    OnboardingPage("👋", Res.string.onb_title_1, Res.string.onb_desc_1),
-    OnboardingPage("📝", Res.string.onb_title_2, Res.string.onb_desc_2),
-    OnboardingPage("🚀", Res.string.onb_title_3, Res.string.onb_desc_3)
+    OnboardingPage(Res.string.onb_title_1, Res.string.onb_desc_1),
+    OnboardingPage(Res.string.onb_title_2, Res.string.onb_desc_2),
+    OnboardingPage(Res.string.onb_title_3, Res.string.onb_desc_3)
 )
 
 @Composable
@@ -79,22 +76,8 @@ fun OnboardingScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Box(Modifier.size(200.dp), contentAlignment = Alignment.Center) {
-                        Box(
-                            Modifier
-                                .size(160.dp)
-                                .background(paper.rule.copy(alpha = 0.45f), CircleShape)
-                                .border(2.dp, paper.ink, CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) { Text(page.emoji, fontSize = 72.sp) }
-                        Box(
-                            Modifier
-                                .size(32.dp)
-                                .align(Alignment.TopEnd)
-                                .background(paper.margin, CircleShape)
-                        )
-                    }
-                    Spacer(Modifier.height(28.dp))
+                    MiniTodoSheet(kind = index, active = pagerState.currentPage == index)
+                    Spacer(Modifier.height(32.dp))
                     Text(
                         stringResource(page.title),
                         style = MaterialTheme.typography.headlineMedium,
@@ -111,7 +94,7 @@ fun OnboardingScreen(
                 }
             }
 
-            PageIndicator(
+            ChecklistIndicator(
                 pageCount = state.pageCount,
                 currentPage = state.page,
                 modifier = Modifier.align(Alignment.CenterHorizontally).padding(vertical = 16.dp)

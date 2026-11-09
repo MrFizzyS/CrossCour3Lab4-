@@ -35,4 +35,13 @@
     <string name="error_username_chars">Only letters, digits, underscore and dot</string>
     <string name="error_password_short">At least 6 characters</string>
     <string name="error_password_weak">Use both letters and digits</string>
+    <string name="auth_error_invalid_credentials">Invalid username or password</string>
+    <string name="auth_error_network">No connection. Check your internet and try again</string>
+    <string name="auth_error_server">Server error. Please try again later</string>
+    <string name="auth_error_unknown">Something went wrong. Please try again</string>
+    <string name="home_title">Home</string>
+    <string name="home_greeting">Hello, %1$s!</string>
+    <string name="home_open_tasks">Open my tasks</string>
+    <string name="logout">Sign out</string>
+    <string name="back_home">Home</string>
 </resources>

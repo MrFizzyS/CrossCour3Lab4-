@@ -20,13 +20,17 @@ fun ProgressHeader(
     total: Int,
     darkTheme: Boolean,
     onDarkThemeChange: (Boolean) -> Unit,
-    onShowOnboarding: () -> Unit
+    onShowOnboarding: () -> Unit,
+    onBack: () -> Unit
 ) {
     val paper = LocalPaper.current
     val target = if (total == 0) 0f else done / total.toFloat()
     val progress by animateFloatAsState(target)
 
     Column(Modifier.fillMaxWidth().padding(top = 20.dp, bottom = 8.dp)) {
+        TextButton(onClick = onBack) {
+            Text("← " + stringResource(Res.string.back_home), color = paper.ink)
+        }
         Row(
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,

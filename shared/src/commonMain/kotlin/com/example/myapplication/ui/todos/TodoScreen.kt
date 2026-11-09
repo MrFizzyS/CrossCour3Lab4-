@@ -29,6 +29,7 @@ fun TodoScreen(
     darkTheme: Boolean,
     onDarkThemeChange: (Boolean) -> Unit,
     onShowOnboarding: () -> Unit,
+    onBack: () -> Unit,
     viewModel: TodoViewModel = koinViewModel()
 ) {
     val paper = LocalPaper.current
@@ -57,7 +58,8 @@ fun TodoScreen(
                 total = state.todos.size,
                 darkTheme = darkTheme,
                 onDarkThemeChange = onDarkThemeChange,
-                onShowOnboarding = onShowOnboarding
+                onShowOnboarding = onShowOnboarding,
+                onBack = onBack
             )
 
             Row(Modifier.padding(vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {

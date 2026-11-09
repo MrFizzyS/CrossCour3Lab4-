@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.auth
 
+import com.example.myapplication.domain.model.AuthError
 import com.example.myapplication.domain.usecase.FieldError
 
 data class AuthState(
@@ -7,7 +8,8 @@ data class AuthState(
     val password: String = "",
     val usernameError: FieldError? = null,
     val passwordError: FieldError? = null,
-    val isPasswordVisible: Boolean = false
+    val isPasswordVisible: Boolean = false,
+    val isLoading: Boolean = false
 )
 
 sealed interface AuthIntent {
@@ -18,5 +20,6 @@ sealed interface AuthIntent {
 }
 
 sealed interface AuthEffect {
-    data object NavigateToTodos : AuthEffect
+    data object NavigateToHome : AuthEffect
+    data class ShowError(val error: AuthError) : AuthEffect   // одноразова подія для снекбара
 }

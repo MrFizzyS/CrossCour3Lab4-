@@ -35,4 +35,13 @@
     <string name="error_username_chars">Лише літери, цифри, підкреслення та крапка</string>
     <string name="error_password_short">Щонайменше 6 символів</string>
     <string name="error_password_weak">Використайте літери та цифри</string>
+    <string name="auth_error_invalid_credentials">Невірне ім’я користувача або пароль</string>
+    <string name="auth_error_network">Немає з’єднання. Перевірте інтернет і спробуйте ще раз</string>
+    <string name="auth_error_server">Помилка сервера. Спробуйте пізніше</string>
+    <string name="auth_error_unknown">Щось пішло не так. Спробуйте ще раз</string>
+    <string name="home_title">Головна</string>
+    <string name="home_greeting">Привіт, %1$s!</string>
+    <string name="home_open_tasks">Мої завдання</string>
+    <string name="logout">Вийти</string>
+    <string name="back_home">На головну</string>
 </resources>

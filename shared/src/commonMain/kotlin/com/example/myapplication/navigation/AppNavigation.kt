@@ -9,18 +9,19 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.example.myapplication.ui.auth.AuthScreen
+import com.example.myapplication.ui.home.HomeScreen
 import com.example.myapplication.ui.onboarding.OnboardingScreen
 import com.example.myapplication.ui.todos.TodoScreen
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 
-// Потрібно для iOS і web, де немає reflection-серіалізації
 private val navConfig = SavedStateConfiguration {
     serializersModule = SerializersModule {
         polymorphic(NavKey::class) {
             subclass(OnboardingRoute::class, OnboardingRoute.serializer())
             subclass(AuthRoute::class, AuthRoute.serializer())
+            subclass(HomeRoute::class, HomeRoute.serializer())
             subclass(TodosRoute::class, TodosRoute.serializer())
         }
     }
@@ -47,7 +48,14 @@ fun AppNavigation(
                 OnboardingScreen(onFinished = { backStack.replaceWith(AuthRoute) })
             }
             entry<AuthRoute> {
-                AuthScreen(onAuthorized = { backStack.replaceWith(TodosRoute) })
+                // Успішна авторизація веде на домашній екран
+                AuthScreen(onAuthorized = { backStack.replaceWith(HomeRoute) })
+            }
+            entry<HomeRoute> {
+                HomeScreen(
+                    onOpenTodos = { backStack.add(TodosRoute) },
+                    onSignedOut = { backStack.replaceWith(AuthRoute) }
+                )
             }
             entry<TodosRoute> {
                 TodoScreen(
@@ -56,14 +64,14 @@ fun AppNavigation(
                     onShowOnboarding = {
                         onTestOnboarding()
                         backStack.replaceWith(OnboardingRoute)
-                    }
+                    },
+                    onBack = { if (backStack.size > 1) backStack.removeLastOrNull() }
                 )
             }
         }
     )
 }
 
-// Додає новий екран і прибирає решту, щоб «Назад» не повертав на онбординг
 private fun MutableList<NavKey>.replaceWith(key: NavKey) {
     add(key)
     while (size > 1) removeAt(0)

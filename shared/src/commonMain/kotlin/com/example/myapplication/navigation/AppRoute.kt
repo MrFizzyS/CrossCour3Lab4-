@@ -6,4 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable sealed interface AppRoute : NavKey
 @Serializable data object OnboardingRoute : AppRoute
 @Serializable data object AuthRoute : AppRoute
+@Serializable data object HomeRoute : AppRoute
 @Serializable data object TodosRoute : AppRoute
